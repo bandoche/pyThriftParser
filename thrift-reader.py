@@ -183,7 +183,7 @@ def parse_thrift(raw_data):
 	__last_fid = 0
 	while True:
 		# print ptr
-		print "@", ptr,
+		print "#@", ptr,
 		type, fid, state, __last_fid, ptr = readFieldBegin(raw_data, ptr, __last_fid)
 		# print ptr
 		# print ptr
@@ -201,12 +201,12 @@ def parse_thrift(raw_data):
 		elif type in (TType.LIST, TType.SET):
 			type2, size, ptr = readCollectionBegin(raw_data, ptr)
 			print
+			print "# type=", type2, "size=", size, "ptr =", ptr
 			ptr = ptr - 2
 			# print 'type2 = ',type2
 		elif type in (TType.STRUCT, TType.MAP):
 			# type2, fid, state, __last_fid, ptr = readFieldBegin(raw_data, ptr, __last_fid)
 			type2, size, ptr = readCollectionBegin(raw_data, ptr)
-			# print "ptr = ", ptr
 			print
 			ptr = ptr - 2
 			# print 'type2 = ',type2
@@ -232,9 +232,15 @@ def parse_thrift(raw_data):
 				print "(0)"
 
 
+# msg = '82 21 00 0f 66 65 74 63 68 4f 70 65 72 61 74 69 6f 6e 73 26 b6 83 03 15 64 00'.replace(' ', '').decode('hex')
+
+
+# parse_thrift(msg)
+# sys.exit()
+
 if len(sys.argv) == 1:
 	print 'no filename'
-else:
+elif len(sys.argv) == 2:
 	filename = sys.argv[1]
 	mpr = MITMProxyReader()
 	clean_dict = mpr.read_file(filename)
@@ -253,6 +259,9 @@ else:
 		except Exception, e:
 			print "[error]", e
 	# print clean_dict
-
-
+elif len(sys.argv) == 3: # last parameter is just dummy (for raw thrift file without MITMProxy)
+	filename = sys.argv[1]
+	f = io.open(filename, 'rb')
+	data = f.read()
+	parse_thrift(data)
 
